@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Login</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- CORREÇÃO: Substituído o link quebrado da cloudflare pelo link real dos ícones (Font Awesome) -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Acessar Conta</h2>
+            <p>Insira seus dados cadastrados para entrar</p>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <div id="errorMessage" class="alert-error" style="display: none;"></div>
+
+            <div class="input-group">
+                <label for="email">E-mail</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-envelope input-icon"></i>
+                    <input type="email" id="email" placeholder="seu@email.com" required autocomplete="email">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="birthdate">Data de Nascimento</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-calendar input-icon"></i>
+                    <input type="date" id="birthdate" required>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <div class="label-wrapper">
+                    <label for="password">Senha</label>
+                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                </div>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="password" placeholder="Sua senha secreta" required>
+                </div>
+            </div>
+            
+            <div class="remember-me">
+                <input type="checkbox" id="remember">
+                <label for="remember">Lembrar de mim neste dispositivo</label>
+            </div>
+            
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
+        
+        <div class="login-footer">
+            <p>Não tem uma conta? <a href="#">Cadastre-se aqui</a></p>
+        </div>
+    </div>
+
+    <script>
+        // CORREÇÃO 1: Envelopamos tudo isso para rodar APENAS quando o formulário for enviado
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            
+            // CORREÇÃO 2: O 'event' agora vem lá de cima da função e segura a página no lugar
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const senha = document.getElementById("password").value;
+            const data = document.getElementById("birthdate").value;
+
+            // Criamos a caixinha com as informações recolhidas
+            const informacoes = { email: email, senha: senha, data: data };
+
+            // ESTUDO //
+
+            // fetch serve para comunicar o endereço (o servidor) onde e qual porta os dados irão ir
+            fetch("http://localhost:3000/salvar", {
+                
+                // aqui ele tá falando que vamos enviar informações ao invés de pegar
+                method: "POST", 
+                
+                headers: { 
+                    "Content-Type": "application/json" // está avisando que tudo vai ser em TEXTO formato JSON
+                },
+                
+                // CORREÇÃO 3: Trocado 'dadosFormulario' para 'informacoes' para bater com a sua variável lá de cima
+                body: JSON.stringify(informacoes) 
+                // O 'body' é o corpo/conteúdo da caixa. 
+                // O 'JSON.stringify' ele transforma todo o meu código compacto pronto pra viagem
+            }) // CORREÇÃO 4: Fechamos as chaves e parênteses do fetch aqui!
+
+            // O servidor recebeu, salvou no MySQL e enviou um recibo de volta. 
+            // O '.then' significa "DEPOIS". 
+            .then(resposta => resposta.json()) // DEPOIS que a resposta chegar, abre o pacote do recibo e transforma em dados legíveis.
+            .then(resultado => {
+                // depois de receber ele avisa o usuário com o alert
+                alert(resultado.mensagem); // Mostra na tela: "Dados gravados com sucesso!"
+            });
+        });
+    </script>
+</body>
+</html>
